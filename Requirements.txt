@@ -1,0 +1,8 @@
+Required functionality Nov 22
+
+2 person game (at least)
+•Place a series of ships of different types on variable size grid
+•Prompt for and record coordinates
+•Decide if a hit or miss occurs
+•Handle out of grid coordinates
+•Identify winning and losing conditions
