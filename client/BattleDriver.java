@@ -1,6 +1,7 @@
 package client;
 
 import java.net.UnknownHostException;
+import java.util.Scanner;
 
 /**
  * parses command  line  options,  instantiates  aBattleClient,
@@ -11,6 +12,8 @@ public class BattleDriver {
         String host;
         int port;
         String username;
+        Scanner sc = new Scanner(System.in);
+        String input;
 
         if (args.length < 3) {
             System.out.println("Usage: java BattleShipDriver <host> <port> <username>");
@@ -21,6 +24,12 @@ public class BattleDriver {
                 username = args[2];
 
                 BattleClient client = new BattleClient(host, port, username);
+
+                while (true) {
+                    input = sc.next();
+                    client.send(input);
+                }
+                
             } catch (NumberFormatException | UnknownHostException e) {
                 System.out.println(e);
             }

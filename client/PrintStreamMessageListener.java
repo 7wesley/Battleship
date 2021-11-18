@@ -7,6 +7,8 @@ import common.MessageSource;
 
 /**
  * Responsible for writing messages to a PrintStream
+ * 
+ * OBSERVER
  */
 public class PrintStreamMessageListener implements MessageListener {
     private PrintStream out;
@@ -15,12 +17,14 @@ public class PrintStreamMessageListener implements MessageListener {
         this.out = out;
     }
 
+    //Called by SUBJECT
     public void messageReceived(String message, MessageSource source) {
-
+        out.println("Source " + source.toString() + " sent " + message);
     }
 
     public void sourceClosed(MessageSource source) {
-
+        source.removeMessageListener(this);
+        System.out.println("PrintStreamMessageListener Connection ended");
     }
 
 }

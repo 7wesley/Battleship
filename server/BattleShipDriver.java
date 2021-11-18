@@ -18,6 +18,7 @@ public class BattleShipDriver {
                     size = Integer.parseInt(args[1]);
                 }
                 BattleServer server = new BattleServer(port);
+                server.listen();
             } catch (NumberFormatException  e) {
                 System.out.println(e);
             }
