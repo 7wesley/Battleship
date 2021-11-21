@@ -136,7 +136,25 @@ public class Game {
         return generator.nextInt((upperBound - lowerBound + 1)) + lowerBound;
     }
 
+    public boolean checkValidMove(String username) {
+        boolean validMove = false;
 
+        for (Grid grid: gridsList) {
+            if (grid.getUsername().equals(username)) {
+                validMove = true;
+            }
+        }
+        if (!validMove) {
+            System.out.println("Username doesn't exist!");
+        }
+        if (username.equals(this.gridsList.get(turnIndex).getUsername())) {
+            System.out.println("Can't hit yourself!");
+            validMove = false;
+        } 
+        
+        return validMove;
+
+    }
     /**
      * Attempts to hit ship and returns true if successful
      * @param username
@@ -144,32 +162,22 @@ public class Game {
      * @param y
      * @return
      */
-    public boolean validHit(String username, int x, int y) {
-        Boolean validMove = false;
-
+    public void makeMove(String username, int x, int y) {
         for (Grid grid: gridsList) {
-            if (grid.getUsername() == username) {
+            if (grid.getUsername().equals(username)) {
                 if (grid.getSquare(x, y) == Ship.Water) {
                     grid.setSquare(Ship.Miss, x, y);
                     System.out.println("Miss!");
-                    validMove = true;
                     this.turnIndex++;
                 } else if (grid.getSquare(x, y).isShip()) {
                     grid.setSquare(Ship.Hit, x, y);
                     System.out.println("Hit!");
-                    validMove = true;
                     this.turnIndex++;
                 } else {
                     System.out.println("Invalid move");
-                    validMove = false;
                 }
             }
         }
-
-        if (!username.equals(this.gridsList.get(turnIndex).getUsername())) {
-            validMove = false;
-        }
-        return validMove;
     }
 
     public Grid getGrid(String username) {
@@ -183,16 +191,18 @@ public class Game {
         return wantedGrid;
     }
 
+    //lose or surrender
     public void removePlayer(String username) {
         for (int i = 0; i < gridsList.size(); i++) {
             if (this.gridsList.get(i).getUsername().equals(username)) {
                 this.gridsList.remove(i);
+                this.turnIndex++;
             }
         }
     }
 
     public String getNextMove() {
-        if (this.turnIndex > this.gridsList.size()) {
+        if (this.turnIndex >= this.gridsList.size()) {
             this.turnIndex = 0;
         }
 

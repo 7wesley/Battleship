@@ -38,16 +38,22 @@ public enum Ship {
         switch (this) {
             case Carrier:
                isShip = true;
+               break;
             case BattleShip:
                 isShip = true;
+                break;
             case Cruiser:
                 isShip = true;
+                break;
             case Destroyer:
                 isShip = true;
+                break;
             case Submarine:
                 isShip = true;
+                break;
             default:
                 isShip = false;
+                break;
         }
         return isShip;
     }

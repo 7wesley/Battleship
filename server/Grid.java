@@ -50,18 +50,18 @@ public class Grid {
 
     @Override
     public String toString() {
-        String text = "";
+        String text = " ";
         for (int i = 0; i < this.grid.length; i++) {
-            text += "  " + i + "  ";
+            text += "   " + i;
         }
         for (int i = 0; i < this.grid.length; i++) {
-            text += "\n    " + "+---".repeat(this.grid.length) + "+";
-            text += "\n" + i;
+            text += "\n  " + "+---".repeat(this.grid.length) + "+";
+            text += "\n" + i + " | ";
             for (int j = 0; j < this.grid[i].length; j++) {
-                text += " | " + this.grid[i][j].getSymbol();
+                text += this.grid[i][j].getSymbol() + " | ";
             }
         }
-        text += "\n    " + "+---".repeat(this.grid.length) + "+";
+        text += "\n  " + "+---".repeat(this.grid.length) + "+";
         return text;
     }
 }

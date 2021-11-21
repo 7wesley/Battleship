@@ -42,14 +42,14 @@ public class BattleServer implements MessageListener {
         //TODO: Change this when implementing networking
         Scanner sc = new Scanner(System.in);
         System.out.println("How many players?");
-        int numPlayers = sc.nextInt();
+        int numPlayers = Integer.parseInt(sc.nextLine());
         System.out.println("Grid size?");
-        int gridSize = sc.nextInt();
+        int gridSize = Integer.parseInt(sc.nextLine());
 
         String[] players = new String[numPlayers];
         for (int i = 0; i < numPlayers; i++) {
             System.out.println("Player " + (i + 1) + " enter your username");
-            players[i] = sc.next();
+            players[i] = sc.nextLine();
         }
 
         String turnUsername;
@@ -60,25 +60,23 @@ public class BattleServer implements MessageListener {
             turnUsername = this.game.getNextMove();
             System.out.println(turnUsername + ", enter your move!");
             String[] move = sc.nextLine().split(" ");
-            //TESTING
-            for (String str: move) {
-                System.out.println(str + " ");
-            }
-            //TESTING
+          
             if (move[0].equals("/fire")) {
                 x = Integer.parseInt(move[1]);
                 y = Integer.parseInt(move[2]);
-                if (!this.game.validHit(move[1], x, y)) {
-                    System.out.println("Invalid move, try again!");
+                if (this.game.checkValidMove(move[3])) {
+                    this.game.makeMove(move[3], x, y);
                 }
             } else if (move[0].equals("/surrender")) {
                 this.game.removePlayer(turnUsername);
             } else if (move[0].equals("/display")) {
                 System.out.println(this.game.getGrid(turnUsername));
+            } else {
+                System.out.println("Invalid command!");
             }
         }
 
-        this.game.getWinner();
+        System.out.println("Player " + this.game.getWinner() + ", you win!!!");
         sc.close();
     }
 
