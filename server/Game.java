@@ -11,7 +11,7 @@ import common.Ship;
 public class Game {
     //Possible change to array
     //"It has a Grid for each client."
-    private Grid[] gridsList;
+    private ArrayList<Grid> gridsList;
     private int turnIndex = 0;
     private int gridSize;
 
@@ -21,9 +21,9 @@ public class Game {
             System.exit(1);
         }
         this.gridSize = gridSize;
-        gridsList = new Grid[players.length];
+        gridsList = new ArrayList<Grid>();
         for (int i = 0; i < players.length; i++) {
-            gridsList[i] = new Grid(this.gridSize);
+            gridsList.add(new Grid(this.gridSize, players[i]));
         }
         this.placeShipsRandomly();
     }
@@ -33,41 +33,49 @@ public class Game {
         int x;
         int y;
         Ship ship;
-        ArrayList<int[]> possibleMoves = new ArrayList<int[]>();
-        int[][] path;
 
-        for (Grid grid: gridsList) {
+        for (Grid grid : gridsList) {
             for (int i = 0; i < this.getNumberShips(); i++) {
-                ship = Ship.getRandomShip();
-                x = generator.nextInt(this.gridSize + 1);
-                y = generator.nextInt(this.gridSize + 1);
 
+                boolean foundValidPlacement = false;
+                while (!foundValidPlacement) {
+                    ship = Ship.getRandomShip();
+                    x = generator.nextInt(this.gridSize + 1);
+                    y = generator.nextInt(this.gridSize + 1);
 
-                if (this.validHorizontalPath(grid, x, x - ship.getSize(), y)) {
-                    possibleMoves.add(this.getPath(grid, x,  x- ship.getSize(), y));
-                }
-                if (this.validHorizontalPath(grid, x, x + ship.getSize(), y)) {
-                    possibleMoves.push(x - ship.getSize(), y);
-                }
-                if (this.validVerticalPath(grid, y, y - ship.getSize(), x)) {
-                    possibleMoves.push(x - ship.getSize(), y);
-                }
-                if (this.validPath(validVerticalPath, y, y + ship.getSize(), x)) {
-                    possibleMoves.push(x - ship.getSize(), y);
-                }
-                
-                int[] chosenMove = possibleMoves.get(generator.nextInt(possibleMoves.length + 1));
-                int chosenY = chosenMove[1];
-                int chosenX = chosenMove[0];
+                    int direction = generator.nextInt(3);
 
-                if(chosenX == x) {
-                    this.setShipVertical(grid, y, chosenY, x, ship);
-                } else {
-                    this.setShipHorizontall(grid, x, chosenX, y, ship);
+                    switch (direction) {
+                    case 0:
+                        foundValidPlacement = this.validHorizontalPath(grid, x - ship.getSize(), x, y);
+                        if (foundValidPlacement) {
+                            foundValidPlacement = true;
+                            this.setShipHorizontal(grid, x - ship.getSize(), x, y, ship);
+                        }
+                        break;
+                    case 1:
+                        if (this.validHorizontalPath(grid, x, x + ship.getSize(), y)) {
+                            foundValidPlacement = true;
+                            this.setShipHorizontal(grid, x, x + ship.getSize(), y, ship);
+                        }
+                        break;
+                    case 2:
+                        if (this.validVerticalPath(grid, y - ship.getSize(), y, x)) {
+                            foundValidPlacement = true;
+                            this.setShipVertical(grid, y, y - ship.getSize(), x, ship);
+                        }
+                        break;
+                    case 3:
+                        if (this.validVerticalPath(grid, y, y + ship.getSize(), x)) {
+                            foundValidPlacement = true;
+                            this.setShipVertical(grid, y, y + ship.getSize(), x, ship);
+                        }
+                        break;
+                    }
+
                 }
-                
             }
-            
+
         }
     }
 
@@ -101,18 +109,17 @@ public class Game {
         return isValid;
     }
 
-    public int[][] setShipVertical(Grid grid, int startX, int endX, int y, Ship ship) {
-        for (int i = startX; i < endX + 1; i++) {
-                grid.setSquare(ship, i, y);
-            }
+    public void setShipHorizontal(Grid grid, int startX, int endX, int y, Ship ship) {
+        for (int i = startX; i < endX; i++) {
+            grid.setSquare(ship, i, y);
         }
+    }
 
-    public int[][] setShipHorizontal(Grid grid, int startY, int endY, int x, Ship ship) {
-            for (int i = startY; i < endY + 1; i++) {
-                    grid.setSquare(ship, i, x);
-                }
-            }
-
+    public void setShipVertical(Grid grid, int startY, int endY, int x, Ship ship) {
+        for (int i = startY; i < endY; i++) {
+            grid.setSquare(ship, x, i);
+        }
+    }
 
     public int getNumberShips() {
         int lowerBound;
@@ -146,10 +153,12 @@ public class Game {
                     grid.setSquare(Ship.Miss, x, y);
                     System.out.println("Miss!");
                     validMove = true;
+                    this.turnIndex++;
                 } else if (grid.getSquare(x, y).isShip()) {
                     grid.setSquare(Ship.Hit, x, y);
                     System.out.println("Hit!");
                     validMove = true;
+                    this.turnIndex++;
                 } else {
                     System.out.println("Invalid move");
                     validMove = false;
@@ -157,7 +166,7 @@ public class Game {
             }
         }
 
-        if (!username.equals(this.gridsList[turnIndex].getUsername())) {
+        if (!username.equals(this.gridsList.get(turnIndex).getUsername())) {
             validMove = false;
         }
         return validMove;
@@ -175,23 +184,19 @@ public class Game {
     }
 
     public void removePlayer(String username) {
-        for (Grid grid: this.gridsList) {
-            if (grid.getUsername().equals(username)) {
-                grid = null;
+        for (int i = 0; i < gridsList.size(); i++) {
+            if (this.gridsList.get(i).getUsername().equals(username)) {
+                this.gridsList.remove(i);
             }
         }
     }
 
     public String getNextMove() {
-        Grid player = this.gridsList[turnIndex];
-
-        while (player.hasLost()) {
-            this.turnIndex++;
-            if (this.turnIndex > this.gridsList.length) {
-                this.turnIndex = 0;
-            }
-            player = this.gridsList[turnIndex];
+        if (this.turnIndex > this.gridsList.size()) {
+            this.turnIndex = 0;
         }
+
+        Grid player = this.gridsList.get(turnIndex);
 
         return player.getUsername();
     }
@@ -199,30 +204,16 @@ public class Game {
 
 
     public boolean isActive() {
-        int lossCounter = 0;
         boolean isActive = true;
-
-        for (Grid grid: gridsList) {
-            if (grid.hasLost()) {
-                lossCounter++;
-            }
-        }
-        if (lossCounter == this.gridsList.length - 1) {
+        if (gridsList.size() == 1) {
             isActive = false;
         }
-
+    
         return isActive;
     }
 
     public String getWinner() {
-        String winner = "";
-
-        for (Grid grid: gridsList) {
-            if (!grid.hasLost()) {
-                winner = grid.getUsername();
-            }
-        }
-
-        return winner;
+        //Only 1 player left at this point
+        return gridsList.get(0).getUsername();
     }
 }

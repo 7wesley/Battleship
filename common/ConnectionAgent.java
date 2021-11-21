@@ -46,7 +46,6 @@ public class ConnectionAgent extends MessageSource implements Runnable {
     //does something w socket field??
     public void run() {
         //socket already connected to host, ready to send msg
-        socket.
 
         
     }

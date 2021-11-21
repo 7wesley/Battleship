@@ -48,39 +48,36 @@ public class BattleServer implements MessageListener {
 
         String[] players = new String[numPlayers];
         for (int i = 0; i < numPlayers; i++) {
-            System.out.println("Player " + numPlayers + " enter your username");
-            players[1] = sc.next();
+            System.out.println("Player " + (i + 1) + " enter your username");
+            players[i] = sc.next();
         }
 
+        String turnUsername;
         this.game = new Game(gridSize, players);
-        int playerIndex = 0;
-        boolean validMove = false;
         int x, y;
-        String turn;
         
         while (this.game.isActive()) {
-            turn = this.game.getNextMove();
-            System.out.println(turn + ", enter your move!");
-            String[] move = sc.next().split(" ");
-
-            if (move[0] == "/fire") {
-                while (!validMove) {
-                    x = Integer.parseInt(move[2]);
-                    y = Integer.parseInt(move[3]);
-                    validMove = this.game.validHit(move[1], x, y);
-                }
-            } else if (move[0] == "/surrender") {
-                this.game.removePlayer(turn);
-            } else if (move[0] == "/display") {
-                System.out.println(this.game.getGrid(players[playerIndex]));
+            turnUsername = this.game.getNextMove();
+            System.out.println(turnUsername + ", enter your move!");
+            String[] move = sc.nextLine().split(" ");
+            //TESTING
+            for (String str: move) {
+                System.out.println(str + " ");
             }
-            
-            playerIndex++;
-            if (playerIndex == players.length) {
-                playerIndex = 0;
+            //TESTING
+            if (move[0].equals("/fire")) {
+                x = Integer.parseInt(move[1]);
+                y = Integer.parseInt(move[2]);
+                if (!this.game.validHit(move[1], x, y)) {
+                    System.out.println("Invalid move, try again!");
+                }
+            } else if (move[0].equals("/surrender")) {
+                this.game.removePlayer(turnUsername);
+            } else if (move[0].equals("/display")) {
+                System.out.println(this.game.getGrid(turnUsername));
             }
         }
-        
+
         this.game.getWinner();
         sc.close();
     }

@@ -10,7 +10,8 @@ public enum Ship {
     Destroyer("D", 5),
     Hit("H", 0),
     Miss("O", 0),
-    Water(" ", 0);
+    Water(" ", 0),
+    Unknown("U", 0);
  
     private String symbol;
     private int size;
@@ -54,7 +55,8 @@ public enum Ship {
     public static Ship getRandomShip() {
         Random generator = new Random();
 
-        return values()[generator.nextInt(values().length)];
+        //Bottom 4 are not ships
+        return values()[generator.nextInt(values().length - 4)];
     }
 
 }
