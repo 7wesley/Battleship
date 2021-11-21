@@ -3,9 +3,9 @@ package common;
 import java.util.Random;
 
 public enum Ship {
-    Carrier("C", 5),
+    Carrier("C", 2),
     BattleShip("B", 3),
-    Cruiser("R", 2),
+    Cruiser("R", 4),
     Submarine("S", 3),
     Destroyer("D", 5),
     Hit("H", 0),

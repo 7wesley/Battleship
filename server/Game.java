@@ -47,8 +47,7 @@ public class Game {
 
                     switch (direction) {
                     case 0:
-                        foundValidPlacement = this.validHorizontalPath(grid, x - ship.getSize(), x, y);
-                        if (foundValidPlacement) {
+                        if (this.validHorizontalPath(grid, x - ship.getSize(), x, y)) {
                             foundValidPlacement = true;
                             this.setShipHorizontal(grid, x - ship.getSize(), x, y, ship);
                         }
@@ -101,7 +100,7 @@ public class Game {
         }
 
         for (int i = startY; i < endY + 1; i++) {
-            if (grid.getSquare(i, x) != Ship.Water) {
+            if (grid.getSquare(x, i) != Ship.Water) {
                 isValid = false;
             }
         }
@@ -196,7 +195,6 @@ public class Game {
         for (int i = 0; i < gridsList.size(); i++) {
             if (this.gridsList.get(i).getUsername().equals(username)) {
                 this.gridsList.remove(i);
-                this.turnIndex++;
             }
         }
     }
