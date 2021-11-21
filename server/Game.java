@@ -42,38 +42,43 @@ public class Game {
                 x = generator.nextInt(this.gridSize + 1);
                 y = generator.nextInt(this.gridSize + 1);
 
-                if (this.validPath(grid, x, x- ship.getSize(), y)) {
+
+                if (this.validHorizontalPath(grid, x, x - ship.getSize(), y)) {
                     possibleMoves.add(this.getPath(grid, x,  x- ship.getSize(), y));
                 }
-                if (this.validPath(move)) {
+                if (this.validHorizontalPath(grid, x, x + ship.getSize(), y)) {
                     possibleMoves.push(x - ship.getSize(), y);
                 }
-                if (this.validPath(move)) {
+                if (this.validVerticalPath(grid, y, y - ship.getSize(), x)) {
                     possibleMoves.push(x - ship.getSize(), y);
                 }
-                if (this.validPath(move)) {
+                if (this.validPath(validVerticalPath, y, y + ship.getSize(), x)) {
                     possibleMoves.push(x - ship.getSize(), y);
                 }
                 
-                path = possibleMoves[generator.nextInt(possibleMoves.length)];
+                int[] chosenMove = possibleMoves.get(generator.nextInt(possibleMoves.length + 1));
+                int chosenY = chosenMove[1];
+                int chosenX = chosenMove[0];
 
-                for (int j = 0; j < possibleMoves.length; j++) {
-                    grid.setSquare(ship, possibleMoves[i][0], possibleMoves[i][0]);
-                    grid.setSquare(ship, possibleMoves[i][0], possibleMoves[i][1]);
+                if(chosenX == x) {
+                    this.setShipVertical(grid, y, chosenY, x, ship);
+                } else {
+                    this.setShipHorizontall(grid, x, chosenX, y, ship);
                 }
+                
             }
             
         }
     }
 
-    public boolean validPath(Grid grid, int startingPoint, int endPoint, int fixedCordinate) {
+    public boolean validHorizontalPath(Grid grid, int startX, int endX, int y) {
         boolean isValid = true;
-        if (endPoint > this.gridSize) {
+        if (endX > this.gridSize) {
             isValid = false;
         }
 
-        for (int i = startingPoint; i < endPoint + 1; i++) {
-            if (grid.getSquare(i, fixedCordinate) != Ship.Water) {
+        for (int i = startX; i < endX + 1; i++) {
+            if (grid.getSquare(i, y) != Ship.Water) {
                 isValid = false;
             }
         }
@@ -81,20 +86,33 @@ public class Game {
         return isValid;
     }
 
-    public int[][] getPath(Grid grid, int startingPoint, int endPoint, int fixedCordinate) {
-        int[][] path = new int[endPoint - startingPoint][2];
-
-        for (int i = 0; i < path.length; i++) {
-            path[i][0] = startingPoint + i;
-            path[i][1] 
+    public boolean validVerticalPath(Grid grid, int startY, int endY, int x) {
+        boolean isValid = true;
+        if (endY > this.gridSize) {
+            isValid = false;
         }
 
-        for (int i = startingPoint; i < endPoint + 1; i++) {
-           path[]
+        for (int i = startY; i < endY + 1; i++) {
+            if (grid.getSquare(i, x) != Ship.Water) {
+                isValid = false;
+            }
         }
 
         return isValid;
     }
+
+    public int[][] setShipVertical(Grid grid, int startX, int endX, int y, Ship ship) {
+        for (int i = startX; i < endX + 1; i++) {
+                grid.setSquare(ship, i, y);
+            }
+        }
+
+    public int[][] setShipHorizontal(Grid grid, int startY, int endY, int x, Ship ship) {
+            for (int i = startY; i < endY + 1; i++) {
+                    grid.setSquare(ship, i, x);
+                }
+            }
+
 
     public int getNumberShips() {
         int lowerBound;
