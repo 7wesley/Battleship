@@ -1,5 +1,9 @@
 package server;
 
+/**
+ * @author Wesley Miller, Justin Clifton
+ * @version 11/22/2021
+ */
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Random;

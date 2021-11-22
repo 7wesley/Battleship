@@ -1,5 +1,9 @@
 package server;
 
+/**
+ * @author Wesley Miller, Justin Clifton
+ * @version 11/22/2021
+ */
 import java.util.Random;
 
 public enum Space {
@@ -16,10 +20,6 @@ public enum Space {
     private String symbol;
     private int size;
 
-    /**
-     * Initialize CardType with value.
-     * @param value - value associated with enum
-     */
     Space(String symbol, int size) {
         this.symbol = symbol;
         this.size = size;

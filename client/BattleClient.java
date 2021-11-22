@@ -1,5 +1,9 @@
 package client;
 
+/**
+ * @author Wesley Miller, Justin Clifton
+ * @version 11/22/2021
+ */
 import java.io.PrintStream;
 import java.net.InetAddress;
 import java.net.Socket;

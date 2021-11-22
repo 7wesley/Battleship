@@ -1,5 +1,9 @@
 package client;
 
+/**
+ * @author Wesley Miller, Justin Clifton
+ * @version 11/22/2021
+ */
 import java.net.UnknownHostException;
 import java.util.Scanner;
 

@@ -1,5 +1,9 @@
 package common;
 
+/**
+ * @author Wesley Miller, Justin Clifton
+ * @version 11/22/2021
+ */
 import java.io.PrintStream;
 import java.net.Socket;
 import java.util.Scanner;

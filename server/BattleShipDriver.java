@@ -1,6 +1,11 @@
 package server;
 
 /**
+ * @author Wesley Miller, Justin Clifton
+ * @version 11/22/2021
+ */
+
+/**
  * Parses command line options, instantiates
  * a BattleServer, and calls its listen() method.
  */
