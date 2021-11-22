@@ -1,6 +1,7 @@
 package server;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Random;
 
 /**
@@ -162,7 +163,11 @@ public class Game {
      * @return
      */
     public void makeMove(String username, int x, int y) {
-        for (Grid grid: gridsList) {
+        Grid grid;
+
+        for (Iterator<Grid> iterator = gridsList.iterator(); iterator.hasNext();) {
+            grid = iterator.next();
+
             if (grid.getUsername().equals(username)) {
                 if (grid.getSquare(x, y) == Space.Water) {
                     grid.setSquare(Space.Miss, x, y);
@@ -172,7 +177,7 @@ public class Game {
                     grid.setSquare(Space.Hit, x, y);
                     System.out.println("Hit!");
                     if (grid.hasLost()) {
-                        this.removePlayer(grid.getUsername());
+                        iterator.remove();
                     }
                     this.turnIndex++;
                 } else {
@@ -194,9 +199,12 @@ public class Game {
 
     //lose or surrender
     public void removePlayer(String username) {
-        for (int i = 0; i < gridsList.size(); i++) {
-            if (this.gridsList.get(i).getUsername().equals(username)) {
-                this.gridsList.remove(i);
+        Grid grid;
+
+        for (Iterator<Grid> iterator = gridsList.iterator(); iterator.hasNext();) {
+            grid = iterator.next();
+            if (grid.getUsername().equals(username)) {
+                iterator.remove();
             }
         }
     }
