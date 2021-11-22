@@ -70,7 +70,7 @@ public class BattleServer implements MessageListener {
             } else if (move[0].equals("/surrender")) {
                 this.game.removePlayer(turnUsername);
             } else if (move[0].equals("/display")) {
-                System.out.println(this.game.getGrid(turnUsername));
+                this.game.displayGrid(move[1]);
             } else {
                 System.out.println("Invalid command!");
             }

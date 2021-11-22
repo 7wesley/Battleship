@@ -179,15 +179,14 @@ public class Game {
         }
     }
 
-    public Grid getGrid(String username) {
-        Grid wantedGrid = null;
-
+    public void displayGrid(String username) {
+        boolean myGrid = gridsList.get(turnIndex).getUsername().equals(username);
+        
         for (Grid grid: gridsList) {
-            if (grid.getUsername() == username) {
-                wantedGrid = grid;
+            if (grid.getUsername().equals(username)) {
+                System.out.println(grid.display(myGrid));
             }
         }
-        return wantedGrid;
     }
 
     //lose or surrender

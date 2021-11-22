@@ -48,8 +48,7 @@ public class Grid {
         return hasLost;
     }
 
-    @Override
-    public String toString() {
+    public String display(boolean myGrid) {
         String text = " ";
         for (int i = 0; i < this.grid.length; i++) {
             text += "   " + i;
@@ -58,10 +57,15 @@ public class Grid {
             text += "\n  " + "+---".repeat(this.grid.length) + "+";
             text += "\n" + i + " | ";
             for (int j = 0; j < this.grid[i].length; j++) {
-                text += this.grid[i][j].getSymbol() + " | ";
+                if (myGrid || !this.grid[i][j].isShip()) {
+                    text += this.grid[i][j].getSymbol() + " | ";
+                } else {
+                    text += Ship.Water.getSymbol() + " | ";
+                }
             }
         }
         text += "\n  " + "+---".repeat(this.grid.length) + "+";
         return text;
     }
+
 }
