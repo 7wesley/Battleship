@@ -1,19 +1,17 @@
 package server;
 
-import common.Ship;
-
 /**
  * Logic for a single board of Battleship.
  */
 public class Grid {
-    private Ship[][] grid;
+    private Space[][] grid;
     private String username;
 
     public Grid(int size, String username) {
-        this.grid = new Ship[size][size]; 
+        this.grid = new Space[size][size]; 
         for (int i = 0; i < this.grid.length; i++) {
             for (int j = 0; j < this.grid[i].length; j++) {
-                this.grid[i][j] = Ship.Water;
+                this.grid[i][j] = Space.Water;
             }
         }
         this.username = username;
@@ -23,14 +21,14 @@ public class Grid {
         return this.username;
     }
 
-    public Ship getSquare(int x, int y) {
+    public Space getSquare(int x, int y) {
         if (x >= this.grid.length || x < 0 || y >= this.grid.length || y < 0) {
-            return Ship.Unknown;
+            return Space.Unknown;
         } 
         return this.grid[y][x];
     }
 
-    public void setSquare(Ship ship, int x, int y) {
+    public void setSquare(Space ship, int x, int y) {
         this.grid[y][x] = ship;
     }   
 
@@ -60,7 +58,7 @@ public class Grid {
                 if (myGrid || !this.grid[i][j].isShip()) {
                     text += this.grid[i][j].getSymbol() + " | ";
                 } else {
-                    text += Ship.Water.getSymbol() + " | ";
+                    text += Space.Water.getSymbol() + " | ";
                 }
             }
         }

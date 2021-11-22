@@ -22,7 +22,7 @@ public class BattleServer implements MessageListener {
     private ConnectionAgent[] players;
 
     //possibly add size param
-    public BattleServer(int port) {
+    public BattleServer(/*int port*/) {
        //serverSocket = new ServerSocket(port);
     }
 

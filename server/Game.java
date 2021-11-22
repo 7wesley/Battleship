@@ -3,8 +3,6 @@ package server;
 import java.util.ArrayList;
 import java.util.Random;
 
-import common.Ship;
-
 /**
  * Logic for the game of BattleShip
  */
@@ -32,7 +30,7 @@ public class Game {
         Random generator = new Random();
         int x;
         int y;
-        Ship ship;
+        Space ship;
         int numShips;
 
         for (Grid grid : gridsList) {
@@ -41,7 +39,7 @@ public class Game {
 
                 boolean foundValidPlacement = false;
                 while (!foundValidPlacement) {
-                    ship = Ship.getRandomShip();
+                    ship = Space.getRandomShip();
                     x = generator.nextInt(this.gridSize + 1);
                     y = generator.nextInt(this.gridSize + 1);
 
@@ -87,7 +85,7 @@ public class Game {
         }
 
         for (int i = startX; i < endX + 1; i++) {
-            if (grid.getSquare(i, y) != Ship.Water) {
+            if (grid.getSquare(i, y) != Space.Water) {
                 isValid = false;
             }
         }
@@ -102,7 +100,7 @@ public class Game {
         }
 
         for (int i = startY; i < endY + 1; i++) {
-            if (grid.getSquare(x, i) != Ship.Water) {
+            if (grid.getSquare(x, i) != Space.Water) {
                 isValid = false;
             }
         }
@@ -110,13 +108,13 @@ public class Game {
         return isValid;
     }
 
-    public void setShipHorizontal(Grid grid, int startX, int endX, int y, Ship ship) {
+    public void setShipHorizontal(Grid grid, int startX, int endX, int y, Space ship) {
         for (int i = startX; i < endX; i++) {
             grid.setSquare(ship, i, y);
         }
     }
 
-    public void setShipVertical(Grid grid, int startY, int endY, int x, Ship ship) {
+    public void setShipVertical(Grid grid, int startY, int endY, int x, Space ship) {
         for (int i = startY; i < endY; i++) {
             grid.setSquare(ship, x, i);
         }
@@ -166,12 +164,12 @@ public class Game {
     public void makeMove(String username, int x, int y) {
         for (Grid grid: gridsList) {
             if (grid.getUsername().equals(username)) {
-                if (grid.getSquare(x, y) == Ship.Water) {
-                    grid.setSquare(Ship.Miss, x, y);
+                if (grid.getSquare(x, y) == Space.Water) {
+                    grid.setSquare(Space.Miss, x, y);
                     System.out.println("Miss!");
                     this.turnIndex++;
                 } else if (grid.getSquare(x, y).isShip()) {
-                    grid.setSquare(Ship.Hit, x, y);
+                    grid.setSquare(Space.Hit, x, y);
                     System.out.println("Hit!");
                     if (grid.hasLost()) {
                         this.removePlayer(grid.getUsername());
