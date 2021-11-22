@@ -33,9 +33,11 @@ public class Game {
         int x;
         int y;
         Ship ship;
+        int numShips;
 
         for (Grid grid : gridsList) {
-            for (int i = 0; i < this.getNumberShips(); i++) {
+            numShips = this.getNumberShips();
+            for (int i = 0; i < numShips; i++) {
 
                 boolean foundValidPlacement = false;
                 while (!foundValidPlacement) {
@@ -43,7 +45,7 @@ public class Game {
                     x = generator.nextInt(this.gridSize + 1);
                     y = generator.nextInt(this.gridSize + 1);
 
-                    int direction = generator.nextInt(3);
+                    int direction = generator.nextInt(4);
 
                     switch (direction) {
                     case 0:
@@ -61,7 +63,7 @@ public class Game {
                     case 2:
                         if (this.validVerticalPath(grid, y - ship.getSize(), y, x)) {
                             foundValidPlacement = true;
-                            this.setShipVertical(grid, y, y - ship.getSize(), x, ship);
+                            this.setShipVertical(grid, y - ship.getSize(), y, x, ship);
                         }
                         break;
                     case 3:
@@ -171,6 +173,9 @@ public class Game {
                 } else if (grid.getSquare(x, y).isShip()) {
                     grid.setSquare(Ship.Hit, x, y);
                     System.out.println("Hit!");
+                    if (grid.hasLost()) {
+                        this.removePlayer(grid.getUsername());
+                    }
                     this.turnIndex++;
                 } else {
                     System.out.println("Invalid move");

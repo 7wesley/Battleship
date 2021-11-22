@@ -27,11 +27,11 @@ public class Grid {
         if (x >= this.grid.length || x < 0 || y >= this.grid.length || y < 0) {
             return Ship.Unknown;
         } 
-        return this.grid[x][y];
+        return this.grid[y][x];
     }
 
     public void setSquare(Ship ship, int x, int y) {
-        this.grid[x][y] = ship;
+        this.grid[y][x] = ship;
     }   
 
     public boolean hasLost() {
