@@ -1,10 +1,16 @@
 package server;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 /**
  * @author Wesley Miller, Justin Clifton
  * @version 11/22/2021
  */
 import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.Scanner;
 
 import common.ConnectionAgent;
@@ -23,26 +29,37 @@ public class BattleServer implements MessageListener {
     private ServerSocket serverSocket;
     private int current;
     private Game game;
-    private ConnectionAgent[] players;
+    private Hashtable<String, ConnectionAgent> players;
+    private boolean start = false;
 
     //possibly add size param
-    public BattleServer(/*int port*/) {
-       //serverSocket = new ServerSocket(port);
+    public BattleServer(int port) throws IOException {
+        System.out.println("Listening on port " + port);
+        serverSocket = new ServerSocket(port);
     }
 
-    public void listen() {
-        //TODO: Use this when implementing networking
+    public void listen() throws IOException {
+        private BufferedReader in;
+
+        while (!serverSocket.isClosed()) {
+            while (!start) {
+                //blocks while waiting for connection
+                Socket clientSocket = serverSocket.accept();
+                in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                String username = in.readLine();
+                this.broadcast(username + " has joined the battle!");
+                ConnectionAgent player = new ConnectionAgent(clientSocket);
+                player.run();
+                this.players.put(username, player);
+            }
+            while (this.game.isActive()) {
+                String turnUsername = this.game.getNextMove();
+                players.get(turnUsername).sendMessage(turnUsername + "s turn!");
+            }
+
+        }
+
         /*
-        for (int i = 0; i < playersize; i++)
-        serverSocket.accept()
-
-        players = new ConnectionAgent[numPlayers];
-        for (int i = 0; i < numPlayers; i++) {
-            ConnectionAgent player = new ConnectionAgent();
-            player.addMessageListener(this);
-            players[i] = player;
-        }*/
-
         Scanner sc = new Scanner(System.in);
         int numPlayers = 0;
         int gridSize = 0;
@@ -84,6 +101,7 @@ public class BattleServer implements MessageListener {
 
         System.out.println("Player " + this.game.getWinner() + ", you win!!!");
         sc.close();
+        */
     }
 
     public String[] createPlayers(int numPlayers, Scanner sc) {
@@ -96,15 +114,38 @@ public class BattleServer implements MessageListener {
     }
 
     public void broadcast(String message) {
-        for (ConnectionAgent player: this.players) {
+        for (ConnectionAgent player: this.players.values()) {
             player.sendMessage(message);
         }
     }
 
     public void messageReceived(String message, MessageSource source) {
-        System.out.println("Source " + source.toString() + " sent " + message);
-        //RECEIVE A PLAYER'S MOVE THEN BROADCAST TO ALL
-        this.broadcast("Player move: " + message);
+        String[] command = message.split(" ");
+        String sender = command[0];
+
+        switch (command[1]) {
+            case "/start":
+                game = new Game(10, this.players);
+                start = true;
+                break;
+            case "/fire":
+                this.fire(message);
+                break;
+            case "/display":
+                String grid = this.game.getGrid(sender, command[3]);
+                this.players.get(sender).sendMessage(grid);
+            default:
+                break;
+        }
+    }
+
+    public void fire(String message) {
+        String[] command = message.split(" ");
+        int x = Integer.parseInt(command[1]);
+        int y = Integer.parseInt(command[2]);
+        if (this.game.checkValidMove(command[3])) {
+            this.game.makeMove(command[3], y, x);
+        }
     }
 
     public void sourceClosed(MessageSource source) {

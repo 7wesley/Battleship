@@ -5,8 +5,11 @@ package server;
  * @version 11/22/2021
  */
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Random;
+
+import common.ConnectionAgent;
 
 /**
  * Logic for the game of BattleShip
@@ -18,15 +21,15 @@ public class Game {
     private int turnIndex = 0;
     private int gridSize;
 
-    public Game(int gridSize, String[] players) {
+    public Game(int gridSize, Hashtable<String, ConnectionAgent> players) {
         if (gridSize > 10 || gridSize < 5) {
             System.out.println("Invalid grid size provided");
             System.exit(1);
         }
         this.gridSize = gridSize;
         gridsList = new ArrayList<Grid>();
-        for (int i = 0; i < players.length; i++) {
-            gridsList.add(new Grid(this.gridSize, players[i]));
+        for (String username: players.keySet()) {
+            gridsList.add(new Grid(this.gridSize, username));
         }
         this.placeShipsRandomly();
     }
@@ -140,18 +143,20 @@ public class Game {
         return generator.nextInt((upperBound - lowerBound + 1)) + lowerBound;
     }
 
-    public boolean checkValidMove(String username) {
-        boolean validMove = false;
+    public boolean checkValidMove(String sender, String target) {
+        boolean validMove = true;
+
+        if (sender.equals(this.gridsList.get(turnIndex).getUsername())) {
+            validMove = false;
+        } 
 
         for (Grid grid: gridsList) {
-            if (grid.getUsername().equals(username)) {
+            if (grid.getUsername().equals(target)) {
                 validMove = true;
             }
         }
-        if (!validMove) {
-            System.out.println("Username doesn't exist!");
-        }
-        if (username.equals(this.gridsList.get(turnIndex).getUsername())) {
+        
+        if (sender.equals(this.gridsList.get(turnIndex).getUsername())) {
             System.out.println("Can't hit yourself!");
             validMove = false;
         } 
@@ -191,14 +196,16 @@ public class Game {
         }
     }
 
-    public void displayGrid(String username) {
-        boolean myGrid = gridsList.get(turnIndex).getUsername().equals(username);
-        
+    public String getGrid(String sender,String username) {
+        boolean myGrid = sender.equals(username);
+        String formattedGrid = "";
+
         for (Grid grid: gridsList) {
             if (grid.getUsername().equals(username)) {
-                System.out.println(grid.display(myGrid));
+                formattedGrid += grid.display(myGrid);
             }
         }
+        return formattedGrid;
     }
 
     //lose or surrender
@@ -238,4 +245,9 @@ public class Game {
         //Only 1 player left at this point
         return gridsList.get(0).getUsername();
     }
+
+    public String getTurn() {
+        return this.gridsList.get(this.turnIndex).getUsername();
+    }
+
 }

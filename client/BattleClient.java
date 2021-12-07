@@ -1,5 +1,6 @@
 package client;
 
+import java.io.IOException;
 /**
  * @author Wesley Miller, Justin Clifton
  * @version 11/22/2021
@@ -39,12 +40,17 @@ public class BattleClient extends MessageSource implements MessageListener {
     }
 
     public void connect() {
-        //socket.send(username);
-
+        try {
         
-        Socket socket = new Socket();
-        agent = new ConnectionAgent(socket);
-        agent.addMessageListener(this);
+            Socket clientSocket = new Socket(this.host, this.port);
+            
+            agent = new ConnectionAgent(clientSocket);
+            agent.addMessageListener(this);
+            agent.run();
+
+        } catch (IOException e) {
+            System.out.println(e);
+        }
 
         
         //agent.sendMessage("username");
@@ -57,6 +63,7 @@ public class BattleClient extends MessageSource implements MessageListener {
     */
     //THIS IS CALLED WHEN SUBJECT WANTS TO NOTIFY notify()
     public void messageReceived(String message, MessageSource source) {
+        super.notifyReceipt(message);
     }
 
     /**
@@ -72,8 +79,12 @@ public class BattleClient extends MessageSource implements MessageListener {
         System.out.println("My connection has ended :(");
     }
 
+    public boolean isConnected() {
+        return this.agent.isConnected();
+    }
+
     public void send(String message) {
         //Send msg to observers
-        super.notifyReceipt(message);
+        agent.sendMessage(message);
     }
 }

@@ -1,6 +1,6 @@
 package common;
 /**
- * This interface represents &quot;observers&quot; of <code>MessageSource</code>s.
+ * This interface represents observers
  *
  * @author Dr. William Kreahling
  * @version November 2017 

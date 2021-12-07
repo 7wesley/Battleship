@@ -29,8 +29,10 @@ public class BattleDriver {
 
                 BattleClient client = new BattleClient(host, port, username);
 
-                while (true) {
+                while (client.isConnected()) {
                     input = sc.next();
+                    //append username
+                    input = username + " " + input;
                     client.send(input);
                 }
                 

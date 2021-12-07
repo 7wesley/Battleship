@@ -1,5 +1,8 @@
 package common;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 /**
  * @author Wesley Miller, Justin Clifton
  * @version 11/22/2021
@@ -22,34 +25,45 @@ public class ConnectionAgent extends MessageSource implements Runnable {
     private PrintStream out;
     private Thread thread;
 
-    public ConnectionAgent() {
-        super();
-        //super.addMessageListener(new BattleClient)
-    }
-
     public ConnectionAgent(Socket socket) {
-        this.socket = socket;
-        thread = new Thread(this);
+        try {
+            this.socket = socket;
+            in = new Scanner(socket.getInputStream());
+            out = new PrintStream(socket.getOutputStream());
+            thread = new Thread(this);
+        } catch (IOException e) {
+            System.out.println(e);
+        }
     }
 
-    //notify all of our observers of message
     public void sendMessage(String message) {
-        super.notifyReceipt(message);
+        out.println(message);
     }
 
     public boolean isConnected() {
-        //return socket.isConnected();
-        return true;
+        return this.socket.isConnected();
     }
 
     public void close() {
-        super.closeMessageSource();
-        //socket.close()?
+        try {
+            super.closeMessageSource();
+            this.socket.close();
+        } catch (IOException e) {
+            System.out.println(e);
+        }
     }
 
-    //does something w socket field??
     public void run() {
-        //socket already connected to host, ready to send msg
-        
+        try {
+            //Constantly waits for new msg from server
+            while (!this.socket.isClosed()) {
+                //blocks?
+                String serverResponse = in.nextLine();
+                super.notifyReceipt(serverResponse);
+                //out.println(serverResponse);
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }   
     }
 }
