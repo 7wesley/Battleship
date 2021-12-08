@@ -30,7 +30,7 @@ public class BattleServer implements MessageListener {
     private int current;
     private Game game;
     private Hashtable<String, ConnectionAgent> players;
-    final int DEFAULT_SIZE = 10;
+    final int DEFAULT_SIZE = 5;
 
     //possibly add size param
     public BattleServer(int port) throws IOException {
@@ -58,6 +58,12 @@ public class BattleServer implements MessageListener {
             this.players.put(username, player);
             this.broadcast(username + " has joined the battle!");
         }
+
+
+    }
+
+    public void close() throws IOException {
+        serverSocket.close();
     }
 
     public void getNextTurn() {
@@ -65,7 +71,7 @@ public class BattleServer implements MessageListener {
             String turnUsername = this.game.getNextMove();
             this.broadcast("It's " + turnUsername + "'s turn!");
         } else {
-            this.broadcast("Winner: " + this.game.getWinner());
+            this.broadcast(this.game.getWinner() + " wins the battleship royale!");
             this.broadcast("Enter '/start' to play again!");
             game = null;
         }
@@ -87,50 +93,68 @@ public class BattleServer implements MessageListener {
     }
 
     public void messageReceived(String message, MessageSource source) {
-        System.out.println("I GOT A MESSAGE");
         String[] command = message.split(" ");
         String sender = command[0];
 
         switch (command[1]) {
             case "/start":
-                if (game == null) {
+                if (this.game != null) {
+                    this.players.get(sender).sendMessage("Game has already started!");
+                } else if (this.players.size() == 1) {
+                    this.players.get(sender).sendMessage("Not enough players to play the game!");
+                } else {
                     game = new Game(DEFAULT_SIZE, this.players);
-                    System.out.println("Game started");
-                    getNextTurn();
+                    this.broadcast("The game begins!");
+                    this.getNextTurn();
                 }
                 break;
             case "/surrender":
-                this.game.removePlayer(sender);
-                this.players.get(sender).sendMessage("You lost");
+                if (this.game != null) {
+                    this.game.removePlayer(sender);
+                    this.players.get(sender).sendMessage("You lost");
+                    this.getNextTurn();
+                } else {
+                    this.players.get(sender).sendMessage("Game not in progress!");
+                }
+                break;
             case "/fire":
-                this.fire(sender, message);
+                if (this.game != null) {
+                    this.fire(sender, message);
+                } else {
+                    this.players.get(sender).sendMessage("Game not in progress!");
+                }
                 break;
             case "/display":
-                if (command.length == 3) {
+                if (this.game == null) {
+                    this.players.get(sender).sendMessage("Game not in progress!");
+                } else if (command.length != 3) {
+                    this.players.get(sender).sendMessage("Invalid command provided!");
+                } else {
                     String grid = this.game.getGrid(sender, command[2]);
                     this.players.get(sender).sendMessage(grid);
-                } else {
-                    this.players.get(sender).sendMessage("Invalid command provided!");
                 }
+                break;
             default:
+                this.players.get(sender).sendMessage("Command doesn't exist!");
                 break;
         }
     }
 
     public void fire(String sender, String message) {
         String[] command = message.split(" ");
-        try {
+        boolean validMove = false;
+
+        if (command.length == 5 && command[2].matches("^\\d+") && command[3].matches("\\d+")) {
             int x = Integer.parseInt(command[2]);
             int y = Integer.parseInt(command[3]);
-            if (this.game.checkValidMove(sender, command[4])) {
+            validMove = this.game.checkValidMove(sender, command[4]);
+            if (validMove) {
                 String result = this.game.makeMove(command[4], y, x);
                 this.broadcast(result);
                 this.getNextTurn();
-            } else {
-                System.out.println("Not valid move!");
-                this.players.get(sender).sendMessage("Invalid command provided!");
-            }
-        } catch (NumberFormatException e) {
+            } 
+        }
+        if (!validMove) {
             this.players.get(sender).sendMessage("Invalid command provided!");
         }
     }
