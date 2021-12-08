@@ -45,15 +45,14 @@ public class BattleClient extends MessageSource implements MessageListener {
             Socket clientSocket = new Socket(this.host, this.port);
             
             agent = new ConnectionAgent(clientSocket);
+            agent.sendMessage(this.username);
             agent.addMessageListener(this);
-            agent.run();
+            Thread thread = new Thread(agent);
+            thread.start();
 
         } catch (IOException e) {
             System.out.println(e);
         }
-
-        
-        //agent.sendMessage("username");
     }
 
     /**
@@ -61,7 +60,6 @@ public class BattleClient extends MessageSource implements MessageListener {
      * @param message The message received by the subject
      * @param source  The source from which this message originated (if needed).
     */
-    //THIS IS CALLED WHEN SUBJECT WANTS TO NOTIFY notify()
     public void messageReceived(String message, MessageSource source) {
         super.notifyReceipt(message);
     }
@@ -72,7 +70,6 @@ public class BattleClient extends MessageSource implements MessageListener {
      *
      * @param source The <code>MessageSource</code> that does not expect more messages.
      */
-    // CONNECTION ENDED
     public void sourceClosed(MessageSource source) {
         //deregister
         source.removeMessageListener(this);
@@ -84,7 +81,6 @@ public class BattleClient extends MessageSource implements MessageListener {
     }
 
     public void send(String message) {
-        //Send msg to observers
         agent.sendMessage(message);
     }
 }

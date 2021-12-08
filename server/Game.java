@@ -144,26 +144,29 @@ public class Game {
     }
 
     public boolean checkValidMove(String sender, String target) {
+        System.out.println("sender: " + sender + " target: " + target);
         boolean validMove = true;
+        boolean playerFound = false;
 
-        if (sender.equals(this.gridsList.get(turnIndex).getUsername())) {
+        if (!sender.equals(this.gridsList.get(turnIndex).getUsername())) {
             validMove = false;
         } 
 
         for (Grid grid: gridsList) {
             if (grid.getUsername().equals(target)) {
-                validMove = true;
+                playerFound = true;
             }
         }
-        
-        if (sender.equals(this.gridsList.get(turnIndex).getUsername())) {
-            System.out.println("Can't hit yourself!");
+        if (!playerFound) {
+            validMove = false;
+        }
+        if (sender.equals(target)) {
             validMove = false;
         } 
         
         return validMove;
-
     }
+    
     /**
      * Attempts to hit ship and returns true if successful
      * @param username
@@ -171,20 +174,21 @@ public class Game {
      * @param y
      * @return
      */
-    public void makeMove(String username, int x, int y) {
+    public String makeMove(String target, int x, int y) {
         Grid grid;
+        String message = "";
 
         for (Iterator<Grid> iterator = gridsList.iterator(); iterator.hasNext();) {
             grid = iterator.next();
 
-            if (grid.getUsername().equals(username)) {
+            if (grid.getUsername().equals(target)) {
                 if (grid.getSquare(x, y) == Space.Water) {
                     grid.setSquare(Space.Miss, x, y);
-                    System.out.println("Miss!");
+                    message = this.gridsList.get(turnIndex).getUsername() + " misses " + target;
                     this.turnIndex++;
                 } else if (grid.getSquare(x, y).isShip()) {
                     grid.setSquare(Space.Hit, x, y);
-                    System.out.println("Hit!");
+                    message = this.gridsList.get(turnIndex).getUsername() + " hits " + target;
                     if (grid.hasLost()) {
                         iterator.remove();
                     }
@@ -194,9 +198,10 @@ public class Game {
                 }
             }
         }
+        return message;
     }
 
-    public String getGrid(String sender,String username) {
+    public String getGrid(String sender, String username) {
         boolean myGrid = sender.equals(username);
         String formattedGrid = "";
 

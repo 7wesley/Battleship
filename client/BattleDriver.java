@@ -28,14 +28,16 @@ public class BattleDriver {
                 username = args[2];
 
                 BattleClient client = new BattleClient(host, port, username);
+                client.connect();
 
                 while (client.isConnected()) {
-                    input = sc.next();
+                    input = sc.nextLine();
                     //append username
                     input = username + " " + input;
                     client.send(input);
                 }
-                
+
+                sc.close();
             } catch (NumberFormatException | UnknownHostException e) {
                 System.out.println(e);
             }

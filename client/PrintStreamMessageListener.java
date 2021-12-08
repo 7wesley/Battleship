@@ -23,7 +23,7 @@ public class PrintStreamMessageListener implements MessageListener {
 
     //Called by SUBJECT
     public void messageReceived(String message, MessageSource source) {
-        out.println("Source " + source.toString() + " sent " + message);
+        out.println(message);
     }
 
     public void sourceClosed(MessageSource source) {
