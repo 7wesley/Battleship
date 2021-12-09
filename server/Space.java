@@ -1,11 +1,13 @@
 package server;
 
+import java.util.Random;
+
 /**
+ * A space that can be placed on a grid
+ * 
  * @author Wesley Miller, Justin Clifton
  * @version 11/22/2021
  */
-import java.util.Random;
-
 public enum Space {
     Carrier("C", 2),
     BattleShip("B", 3),
@@ -17,22 +19,41 @@ public enum Space {
     Water(" ", 0),
     Unknown("U", 0);
  
+    /** The symbol associated with the space */
     private String symbol;
+    /** The size associated with the space */
     private int size;
 
+    /**
+     * Constructor for Space
+     * @param symbol - The symbol associated with the space
+     * @param size - The size associated with the space
+     */
     Space(String symbol, int size) {
         this.symbol = symbol;
         this.size = size;
     }
 
+    /**
+     * Gets the symbol associated with the space
+     * @return the symbol associated with the space
+     */
     public String getSymbol() {
         return this.symbol;
     }
 
+    /**
+     * Gets the size associated with the space
+     * @return the size associated with the space
+     */
     public int getSize() {
         return this.size;
     }
 
+    /**
+     * Determines if this space is a ship
+     * @return true if it a ship, else false
+     */
     public boolean isShip() {
         boolean isShip = false;
         switch (this) {
@@ -58,6 +79,10 @@ public enum Space {
         return isShip;
     }
 
+    /**
+     * Randomly gets a Space
+     * @return a random Space
+     */
     public static Space getRandomShip() {
         Random generator = new Random();
 

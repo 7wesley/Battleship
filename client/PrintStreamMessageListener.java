@@ -5,6 +5,7 @@ import common.MessageSource;
 
 /**
  * Responsible for writing messages to a PrintStream
+ * 
  * @author Wesley Miller, Justin Clifton
  * @version 11/22/2021
  */

@@ -13,20 +13,17 @@ import common.MessageSource;
  * application. It is responsible for creating 
  * a ConnectionAgent, reading input from the user, and sending 
  * that input to the server via the ConnectionAgent.
+ * 
  * @author Wesley Miller, Justin Clifton
  * @version 11/22/2021
  */
 public class BattleClient extends MessageSource implements MessageListener {
-
     /** The host adress */
     private InetAddress host;
-
     /** The port */
     private int port;
-
     /** The clients username */
     private String username;
-
     /** Stream used for printing */
     private PrintStreamMessageListener stream;
 

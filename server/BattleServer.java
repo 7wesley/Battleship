@@ -3,14 +3,9 @@ package server;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-/**
- * @author Wesley Miller, Justin Clifton
- * @version 11/22/2021
- */
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Hashtable;
-import java.util.Scanner;
 
 import common.ConnectionAgent;
 import common.MessageListener;
@@ -18,23 +13,40 @@ import common.MessageSource;
 
 /**
  * Implements the server-side logic of this client-server
- * application. It isresponsible for accepting incoming 
+ * application. It is responsible for accepting incoming 
  * connections, creating ConnectionAgents, and passing 
- * the ConnectionAgent off to threads for processing.  
+ * the ConnectionAgent off to threads for processing.
  * 
+ * @author Wesley Miller, Justin Clifton
+ * @version 12/8/2021
  */
 public class BattleServer implements MessageListener {
+    /** Server socket to receive and send data from */
     private ServerSocket serverSocket;
+    /** The game of Battleship */
     private Game game;
+    /** List of players in the game with usernames as keys */
     private Hashtable<String, ConnectionAgent> players;
+    /** The default size of each player's grid */
     final int DEFAULT_SIZE = 5;
 
+    /**
+     * Constructor for BattleServer
+     * @param port - Port to host the server on
+     * @throws IOException - If port is not available
+     */
     public BattleServer(int port) throws IOException {
         System.out.println("Listening on port " + port);
         serverSocket = new ServerSocket(port);
         players = new Hashtable<>();
     }
 
+    /**
+     * Listens for incoming client connections. Once connected, a 
+     * connectionAgent is created, the server is registered as a listener
+     * for it, and it is ran in a separate thread.
+     * @throws IOException - If server crashes
+     */
     public void listen() throws IOException {
         BufferedReader in;
         
@@ -56,6 +68,10 @@ public class BattleServer implements MessageListener {
 
     }
 
+    /**
+     * Gets the next turn from the game field and then broadcasts
+     * to the room whose turn it is
+     */
     public void getNextTurn() {
         if (this.game.isActive()) {
             String turnUsername = this.game.getNextMove();
@@ -67,12 +83,22 @@ public class BattleServer implements MessageListener {
         }
     }
 
+    /**
+     * Sends a message to all clients connected to the server
+     * @param message - The message being sent to all clients
+     */
     public void broadcast(String message) {
         for (ConnectionAgent player: this.players.values()) {
             player.sendMessage(message);
         }
     }
 
+    /**
+     * How the server reacts when it receives a new message from
+     * one of its connectionAgents.
+     * @message - The message the server has received from a client
+     * @source - The subject that sent the message
+     */
     public void messageReceived(String message, MessageSource source) {
         String[] command = message.split(" ");
         String sender = command[0];
@@ -113,6 +139,11 @@ public class BattleServer implements MessageListener {
         }
     }
 
+    /**
+     * Logic for starting the game. If the game is already in progress,
+     * the player attempting to start will be alerted
+     * @param sender - The client sending the start request
+     */
     public void start(String sender) {
         if (this.game != null) {
             this.players.get(sender).sendMessage("Game has already started!");
@@ -125,6 +156,12 @@ public class BattleServer implements MessageListener {
         }
     }
 
+    /**
+     * Logic for attempting to fire at a player. Will fail and alert
+     * the sender if the checkValidMove method in Game returns false
+     * @param sender - The client sending the fire request
+     * @param message - The entire fire command
+     */
     public void fire(String sender, String message) {
         String[] command = message.split(" ");
         boolean validMove = false;
@@ -144,6 +181,10 @@ public class BattleServer implements MessageListener {
         }
     }
 
+    /**
+     * Removes the server as a listener from some subject
+     * @source - The subject that is being unsubscribed from
+     */
     public void sourceClosed(MessageSource source) {
         source.removeMessageListener(this);
     }

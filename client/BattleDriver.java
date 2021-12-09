@@ -5,6 +5,7 @@ import java.util.Scanner;
 /**
  * Parses command  line  options,  instantiates  a BattleClient,
  * reads messages from the keyboards, and sends them to client.
+ * 
  * @author Wesley Miller, Justin Clifton
  * @version 11/22/2021
  */
@@ -31,7 +32,7 @@ public class BattleDriver {
 
                 BattleClient client = new BattleClient(host, port, username);
                 client.connect();
-                
+
                 while (client.isConnected()) {
                     input = sc.nextLine();
                     //append username

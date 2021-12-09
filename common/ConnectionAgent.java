@@ -17,13 +17,10 @@ public class ConnectionAgent extends MessageSource implements Runnable {
 
     /** The socket for the connection*/
     private Socket socket;
-
     /** Scanner used for input */
     private Scanner in;
-
     /** PrintStream used for output */
     private PrintStream out;
-
     /** Thread for ConnectionAgent*/
     private Thread thread;
 

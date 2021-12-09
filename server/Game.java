@@ -1,9 +1,5 @@
 package server;
 
-/**
- * @author Wesley Miller, Justin Clifton
- * @version 11/22/2021
- */
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -13,12 +9,23 @@ import common.ConnectionAgent;
 
 /**
  * Logic for the game of BattleShip
+ * 
+ * @author Wesley Miller, Justin Clifton
+ * @version 12/8/2021
  */
 public class Game {
+    /** The players in the game respresented by grids */
     private ArrayList<Grid> gridsList;
+    /** The index of whose turn it is */
     private int turnIndex = 0;
+    /** The size of each player's grid */
     private int gridSize;
 
+    /**
+     * Constructor for Game
+     * @param gridSize - The size of each player's grid
+     * @param players - The players that will be part of the game
+     */
     public Game(int gridSize, Hashtable<String, ConnectionAgent> players) {
         if (gridSize > 10 || gridSize < 5) {
             System.out.println("Invalid grid size provided");
@@ -32,6 +39,9 @@ public class Game {
         this.placeShipsRandomly();
     }
 
+    /**
+     * Logic for placing ships randomly on each player's grid
+     */
     public void placeShipsRandomly() {
         Random generator = new Random();
         int x;
@@ -84,6 +94,15 @@ public class Game {
         }
     }
 
+    /**
+     * Determines if it is possible to place a ship in the coordinates
+     * passed in
+     * @param grid - The grid being checked for validation
+     * @param startX - The starting x coordinate
+     * @param endX - The ending x coordinate
+     * @param y - The constant y coordinate
+     * @return true if ship can be placed, else false
+     */
     public boolean validHorizontalPath(Grid grid, int startX, int endX, int y) {
         boolean isValid = true;
         if (endX > this.gridSize) {
@@ -99,6 +118,15 @@ public class Game {
         return isValid;
     }
 
+    /**
+     * Determines if it is possible to place a ship in the coordinates
+     * passed in
+     * @param grid - The grid being checked for validation
+     * @param startY - The starting y coordinate
+     * @param endY - The ending y coordinate
+     * @param x - The constant x coordinate
+     * @return true if ship can be placed, else false
+     */
     public boolean validVerticalPath(Grid grid, int startY, int endY, int x) {
         boolean isValid = true;
         if (endY > this.gridSize) {
@@ -114,18 +142,39 @@ public class Game {
         return isValid;
     }
 
+    /**
+     * Sets a ship horizontally using the coordinates passed in
+     * @param grid - The grid to place the ship on
+     * @param startX - The starting x coordinate
+     * @param endX - The ending x coordinate
+     * @param y - The constant y coordinate
+     * @param ship - The ship being placed
+     */
     public void setShipHorizontal(Grid grid, int startX, int endX, int y, Space ship) {
         for (int i = startX; i < endX; i++) {
             grid.setSquare(ship, i, y);
         }
     }
 
+    /**
+     * Sets a ship vertically using the coordinates passed in
+     * @param grid - The grid to place the ship on
+     * @param startY - The starting y coordinate
+     * @param endY - The ending y coordinate
+     * @param x - The constant x coordinate
+     * @param ship - The ship being placed
+     */
     public void setShipVertical(Grid grid, int startY, int endY, int x, Space ship) {
         for (int i = startY; i < endY; i++) {
             grid.setSquare(ship, x, i);
         }
     }
 
+    /**
+     * Determines the number of ships that will be placed on a
+     * player's board based on the grid size.
+     * @return - The number of ships to be placed
+     */
     public int getNumberShips() {
         int lowerBound;
         int upperBound;
@@ -141,6 +190,12 @@ public class Game {
         return generator.nextInt((upperBound - lowerBound + 1)) + lowerBound;
     }
 
+    /**
+     * Determines if a move from one player to another is valid
+     * @param sender - The person attempting to make the move
+     * @param target - The person that is being attacked
+     * @return true if the move is valid, else false
+     */
     public boolean checkValidMove(String sender, String target) {
         boolean validMove = true;
         boolean playerFound = false;
@@ -165,11 +220,12 @@ public class Game {
     }
     
     /**
-     * Attempts to hit ship and returns true if successful
-     * @param username
-     * @param x
-     * @param y
-     * @return
+     * Attempts to hit a player's grid at a passed in coordinate, and
+     * returns a string based on the result
+     * @param target - The person being attacked
+     * @param x - The x coordinate of the move
+     * @param y - The y coordinate of the move
+     * @return a string containing the result of the attack
      */
     public String makeMove(String target, int x, int y) {
         Grid grid;
@@ -198,6 +254,14 @@ public class Game {
         return message;
     }
 
+    /**
+     * Gets the grid of a specific player. Only the sender can view
+     * their own ships.
+     * @param sender - The user attempting to display a grid
+     * @param username - The username of the grid that is attempting to
+     * be displayed
+     * @return a string containing the grid of the desired user
+     */
     public String getGrid(String sender, String username) {
         boolean myGrid = sender.equals(username);
         String formattedGrid = "";
@@ -210,7 +274,10 @@ public class Game {
         return formattedGrid;
     }
 
-    //lose or surrender
+    /**
+     * Removes a player from the game
+     * @param username - The name of the player to be removed
+     */
     public void removePlayer(String username) {
         Grid grid;
 
@@ -222,6 +289,10 @@ public class Game {
         }
     }
 
+    /**
+     * Finds out whose turn it is next
+     * @return The username of whose turn it currently is
+     */
     public String getNextMove() {
         if (this.turnIndex >= this.gridsList.size()) {
             this.turnIndex = 0;
@@ -232,8 +303,10 @@ public class Game {
         return player.getUsername();
     }
 
-
-
+    /**
+     * Determines if a game still has more than one player in it
+     * @return true if there is more than one player, else false
+     */
     public boolean isActive() {
         boolean isActive = true;
         if (gridsList.size() == 1) {
@@ -243,11 +316,20 @@ public class Game {
         return isActive;
     }
 
+    /**
+     * Find the winner of the game, which will always be the
+     * last remaining player
+     * @return the last remaining player
+     */
     public String getWinner() {
         //Only 1 player left at this point
         return gridsList.get(0).getUsername();
     }
 
+    /**
+     * Get the username of whose turn it currently is
+     * @return the username of whose turn it currently is
+     */
     public String getTurn() {
         return this.gridsList.get(this.turnIndex).getUsername();
     }

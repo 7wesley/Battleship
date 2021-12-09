@@ -3,13 +3,11 @@ package server;
 import java.io.IOException;
 
 /**
- * @author Wesley Miller, Justin Clifton
- * @version 11/22/2021
- */
-
-/**
  * Parses command line options, instantiates
  * a BattleServer, and calls its listen() method.
+ * 
+ * @author Wesley Miller, Justin Clifton
+ * @version 12/8/2021
  */
 public class BattleShipDriver {
     public static void main(String args[]) {
