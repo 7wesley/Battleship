@@ -39,20 +39,14 @@ public class BattleClient extends MessageSource implements MessageListener {
         this.username = username;
     }
 
-    public void connect() {
-        try {
+    public void connect() throws IOException {
+        Socket clientSocket = new Socket(this.host, this.port);
         
-            Socket clientSocket = new Socket(this.host, this.port);
-            
-            agent = new ConnectionAgent(clientSocket);
-            agent.sendMessage(this.username);
-            agent.addMessageListener(this);
-            Thread thread = new Thread(agent);
-            thread.start();
-
-        } catch (IOException e) {
-            System.out.println(e);
-        }
+        agent = new ConnectionAgent(clientSocket);
+        agent.sendMessage(this.username);
+        agent.addMessageListener(this);
+        Thread thread = new Thread(agent);
+        thread.start();
     }
 
     /**
@@ -71,9 +65,7 @@ public class BattleClient extends MessageSource implements MessageListener {
      * @param source The <code>MessageSource</code> that does not expect more messages.
      */
     public void sourceClosed(MessageSource source) {
-        //deregister
         source.removeMessageListener(this);
-        System.out.println("My connection has ended :(");
     }
 
     public boolean isConnected() {

@@ -15,14 +15,14 @@ public class BattleShipDriver {
     public static void main(String args[]) {
         int port;
         
-        if (args.length < 1) {
+        if (args.length != 1) {
             System.out.println("Usage: java BattleShipDriver <port>");
         } else {
             try {
                 port = Integer.parseInt(args[0]);
                 BattleServer server = new BattleServer(port);
                 server.listen();
-            } catch (IOException | NumberFormatException e) {
+            } catch (IOException | IllegalArgumentException e) {
                 System.out.println(e);
             }
         }

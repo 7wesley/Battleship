@@ -1,10 +1,10 @@
 package client;
 
+import java.io.IOException;
 /**
  * @author Wesley Miller, Justin Clifton
  * @version 11/22/2021
  */
-import java.net.UnknownHostException;
 import java.util.Scanner;
 
 /**
@@ -19,7 +19,7 @@ public class BattleDriver {
         Scanner sc = new Scanner(System.in);
         String input;
 
-        if (args.length < 3) {
+        if (args.length != 3) {
             System.out.println("Usage: java BattleShipDriver <host> <port> <username>");
         } else {
             try {
@@ -29,7 +29,7 @@ public class BattleDriver {
 
                 BattleClient client = new BattleClient(host, port, username);
                 client.connect();
-
+                
                 while (client.isConnected()) {
                     input = sc.nextLine();
                     //append username
@@ -38,7 +38,7 @@ public class BattleDriver {
                 }
 
                 sc.close();
-            } catch (NumberFormatException | UnknownHostException e) {
+            } catch (NumberFormatException | IOException e) {
                 System.out.println(e);
             }
         }

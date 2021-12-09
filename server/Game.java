@@ -15,8 +15,6 @@ import common.ConnectionAgent;
  * Logic for the game of BattleShip
  */
 public class Game {
-    //Possible change to array
-    //"It has a Grid for each client."
     private ArrayList<Grid> gridsList;
     private int turnIndex = 0;
     private int gridSize;
@@ -144,7 +142,6 @@ public class Game {
     }
 
     public boolean checkValidMove(String sender, String target) {
-        System.out.println("sender: " + sender + " target: " + target);
         boolean validMove = true;
         boolean playerFound = false;
 

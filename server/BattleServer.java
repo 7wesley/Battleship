@@ -9,7 +9,6 @@ import java.io.InputStreamReader;
  */
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Scanner;
 
@@ -23,16 +22,13 @@ import common.MessageSource;
  * connections, creating ConnectionAgents, and passing 
  * the ConnectionAgent off to threads for processing.  
  * 
- * OBSERVER
  */
 public class BattleServer implements MessageListener {
     private ServerSocket serverSocket;
-    private int current;
     private Game game;
     private Hashtable<String, ConnectionAgent> players;
     final int DEFAULT_SIZE = 5;
 
-    //possibly add size param
     public BattleServer(int port) throws IOException {
         System.out.println("Listening on port " + port);
         serverSocket = new ServerSocket(port);
@@ -41,10 +37,9 @@ public class BattleServer implements MessageListener {
 
     public void listen() throws IOException {
         BufferedReader in;
-
+        
         while (!serverSocket.isClosed()) {
             //blocks while waiting for connection
-            System.out.println("WAITING FOR NEW CLIENT");
             Socket clientSocket = serverSocket.accept();
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             String username = in.readLine();
@@ -54,16 +49,11 @@ public class BattleServer implements MessageListener {
             player.addMessageListener(this);
             Thread thread = new Thread(player);
             thread.start();
-
+            
             this.players.put(username, player);
             this.broadcast(username + " has joined the battle!");
         }
 
-
-    }
-
-    public void close() throws IOException {
-        serverSocket.close();
     }
 
     public void getNextTurn() {
@@ -75,15 +65,6 @@ public class BattleServer implements MessageListener {
             this.broadcast("Enter '/start' to play again!");
             game = null;
         }
-    }
-
-    public String[] createPlayers(int numPlayers, Scanner sc) {
-        String[] players = new String[numPlayers];
-        for (int i = 0; i < numPlayers; i++) {
-            System.out.println("Player " + (i + 1) + " enter your username");
-            players[i] = sc.nextLine();
-        }
-        return players;
     }
 
     public void broadcast(String message) {
@@ -98,15 +79,7 @@ public class BattleServer implements MessageListener {
 
         switch (command[1]) {
             case "/start":
-                if (this.game != null) {
-                    this.players.get(sender).sendMessage("Game has already started!");
-                } else if (this.players.size() == 1) {
-                    this.players.get(sender).sendMessage("Not enough players to play the game!");
-                } else {
-                    game = new Game(DEFAULT_SIZE, this.players);
-                    this.broadcast("The game begins!");
-                    this.getNextTurn();
-                }
+                this.start(sender);
                 break;
             case "/surrender":
                 if (this.game != null) {
@@ -140,6 +113,18 @@ public class BattleServer implements MessageListener {
         }
     }
 
+    public void start(String sender) {
+        if (this.game != null) {
+            this.players.get(sender).sendMessage("Game has already started!");
+        } else if (this.players.size() == 1) {
+            this.players.get(sender).sendMessage("Not enough players to play the game!");
+        } else {
+            game = new Game(DEFAULT_SIZE, this.players);
+            this.broadcast("The game begins!");
+            this.getNextTurn();
+        }
+    }
+
     public void fire(String sender, String message) {
         String[] command = message.split(" ");
         boolean validMove = false;
@@ -161,6 +146,5 @@ public class BattleServer implements MessageListener {
 
     public void sourceClosed(MessageSource source) {
         source.removeMessageListener(this);
-        System.out.println("BattleServer Connection ended");
     }
 }

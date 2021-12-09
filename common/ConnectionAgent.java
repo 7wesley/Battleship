@@ -1,8 +1,6 @@
 package common;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 /**
  * @author Wesley Miller, Justin Clifton
  * @version 11/22/2021
@@ -25,15 +23,11 @@ public class ConnectionAgent extends MessageSource implements Runnable {
     private PrintStream out;
     private Thread thread;
 
-    public ConnectionAgent(Socket socket) {
-        try {
-            this.socket = socket;
-            in = new Scanner(socket.getInputStream());
-            out = new PrintStream(socket.getOutputStream());
-            thread = new Thread(this);
-        } catch (IOException e) {
-            System.out.println(e);
-        }
+    public ConnectionAgent(Socket socket) throws IOException {
+        this.socket = socket;
+        in = new Scanner(socket.getInputStream());
+        out = new PrintStream(socket.getOutputStream());
+        thread = new Thread(this);
     }
 
     public void sendMessage(String message) {
@@ -44,26 +38,15 @@ public class ConnectionAgent extends MessageSource implements Runnable {
         return this.socket.isConnected();
     }
 
-    public void close() {
-        try {
-            super.closeMessageSource();
-            this.socket.close();
-        } catch (IOException e) {
-            System.out.println(e);
-        }
+    public void close() throws IOException {
+        super.closeMessageSource();
+        this.socket.close();
     }
 
     public void run() {
-        try {
-            //Constantly waits for new msg from server
-            while (!this.socket.isClosed()) {
-                //blocks?
-                String serverResponse = in.nextLine();
-                super.notifyReceipt(serverResponse);
-                //out.println(serverResponse);
-            }
-        } catch (Exception e) {
-            System.out.println(e);
-        }   
+        while (!this.socket.isClosed()) {
+            String serverResponse = in.nextLine();
+            super.notifyReceipt(serverResponse);
+        }
     }
 }
