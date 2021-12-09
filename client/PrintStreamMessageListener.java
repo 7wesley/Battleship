@@ -30,7 +30,7 @@ public class PrintStreamMessageListener implements MessageListener {
 
     /**
      * Used to deregister listener
-     * @param source Not used.
+     * @param source Used to get the message source. 
      */
     public void sourceClosed(MessageSource source) {
         source.removeMessageListener(this);
