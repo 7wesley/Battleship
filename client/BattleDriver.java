@@ -1,18 +1,20 @@
 package client;
-
 import java.io.IOException;
-/**
- * @author Wesley Miller, Justin Clifton
- * @version 11/22/2021
- */
 import java.util.Scanner;
 
 /**
- * parses command  line  options,  instantiates  aBattleClient,
+ * Parses command  line  options,  instantiates  a BattleClient,
  * reads messages from the keyboards, and sends them to client.
+ * @author Wesley Miller, Justin Clifton
+ * @version 11/22/2021
  */
 public class BattleDriver {
+    /**
+     * Main method for BattleDriver
+     * @param args commandLine arguments
+     */
     public static void main(String args[]) {
+
         String host;
         int port;
         String username;
