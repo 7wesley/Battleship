@@ -2,6 +2,7 @@ package common;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.Socket;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 /**
@@ -14,7 +15,6 @@ import java.util.Scanner;
  * @version 11/22/2021 
 */
 public class ConnectionAgent extends MessageSource implements Runnable {
-
     /** The socket for the connection*/
     private Socket socket;
     /** Scanner used for input */
@@ -49,7 +49,7 @@ public class ConnectionAgent extends MessageSource implements Runnable {
      * @return true or false depending on if socket is connected.
      */
     public boolean isConnected() {
-        return this.socket.isConnected();
+        return !this.socket.isClosed();
     }
 
     /**
@@ -58,6 +58,8 @@ public class ConnectionAgent extends MessageSource implements Runnable {
      */
     public void close() throws IOException {
         super.closeMessageSource();
+        in.close();
+        out.close();
         this.socket.close();
     }
 
@@ -65,9 +67,17 @@ public class ConnectionAgent extends MessageSource implements Runnable {
      * Used to read input from server and notify
      */
     public void run() {
-        while (!this.socket.isClosed()) {
-            String serverResponse = in.nextLine();
-            super.notifyReceipt(serverResponse);
+        try {
+            while (!this.socket.isClosed()) {
+                String serverResponse = in.nextLine();
+                super.notifyReceipt(serverResponse);
+            }
+        } catch (NoSuchElementException e) {
+            try {
+                this.close();
+            } catch (IOException o) {
+                System.out.println(o);
+            }
         }
     }
 }

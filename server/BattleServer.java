@@ -75,6 +75,18 @@ public class BattleServer implements MessageListener {
     public void getNextTurn() {
         if (this.game.isActive()) {
             String turnUsername = this.game.getNextMove();
+            ConnectionAgent agent = this.players.get(turnUsername);
+            if (!agent.isConnected()) {
+                this.game.removePlayer(turnUsername);
+                this.players.remove(turnUsername);
+                try {
+                    agent.close();
+                } catch (IOException e) {
+                    System.out.println(e);
+                }
+                this.getNextTurn();
+                return;
+            }
             this.broadcast("It's " + turnUsername + "'s turn!");
         } else {
             this.broadcast(this.game.getWinner() + " wins the battleship royale!");
