@@ -35,8 +35,6 @@ public class BattleDriver {
 
                 while (client.isConnected()) {
                     input = sc.nextLine();
-                    //append username
-                    input = username + " " + input;
                     client.send(input);
                 }
 

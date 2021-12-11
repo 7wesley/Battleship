@@ -26,7 +26,7 @@ public class Game {
      * @param gridSize - The size of each player's grid
      * @param players - The players that will be part of the game
      */
-    public Game(int gridSize, Hashtable<String, ConnectionAgent> players) {
+    protected Game(int gridSize, Hashtable<String, ConnectionAgent> players) {
         if (gridSize > 10 || gridSize < 5) {
             System.out.println("Invalid grid size provided");
             System.exit(1);
@@ -42,7 +42,7 @@ public class Game {
     /**
      * Logic for placing ships randomly on each player's grid
      */
-    public void placeShipsRandomly() {
+    private void placeShipsRandomly() {
         Random generator = new Random();
         int x;
         int y;
@@ -103,7 +103,7 @@ public class Game {
      * @param y - The constant y coordinate
      * @return true if ship can be placed, else false
      */
-    public boolean validHorizontalPath(Grid grid, int startX, int endX, int y) {
+    private boolean validHorizontalPath(Grid grid, int startX, int endX, int y) {
         boolean isValid = true;
         if (endX > this.gridSize) {
             isValid = false;
@@ -127,7 +127,7 @@ public class Game {
      * @param x - The constant x coordinate
      * @return true if ship can be placed, else false
      */
-    public boolean validVerticalPath(Grid grid, int startY, int endY, int x) {
+    private boolean validVerticalPath(Grid grid, int startY, int endY, int x) {
         boolean isValid = true;
         if (endY > this.gridSize) {
             isValid = false;
@@ -150,7 +150,7 @@ public class Game {
      * @param y - The constant y coordinate
      * @param ship - The ship being placed
      */
-    public void setShipHorizontal(Grid grid, int startX, int endX, int y, Space ship) {
+    private void setShipHorizontal(Grid grid, int startX, int endX, int y, Space ship) {
         for (int i = startX; i < endX; i++) {
             grid.setSquare(ship, i, y);
         }
@@ -164,7 +164,7 @@ public class Game {
      * @param x - The constant x coordinate
      * @param ship - The ship being placed
      */
-    public void setShipVertical(Grid grid, int startY, int endY, int x, Space ship) {
+    private void setShipVertical(Grid grid, int startY, int endY, int x, Space ship) {
         for (int i = startY; i < endY; i++) {
             grid.setSquare(ship, x, i);
         }
@@ -175,7 +175,7 @@ public class Game {
      * player's board based on the grid size.
      * @return - The number of ships to be placed
      */
-    public int getNumberShips() {
+    private int getNumberShips() {
         int lowerBound;
         int upperBound;
         Random generator = new Random();
@@ -196,7 +196,7 @@ public class Game {
      * @param target - The person that is being attacked
      * @return true if the move is valid, else false
      */
-    public boolean checkValidMove(String sender, String target) {
+    protected boolean checkValidMove(String sender, String target) {
         boolean validMove = true;
         boolean playerFound = false;
 
@@ -227,7 +227,7 @@ public class Game {
      * @param y - The y coordinate of the move
      * @return a string containing the result of the attack
      */
-    public String makeMove(String target, int x, int y) {
+    protected String makeMove(String target, int x, int y) {
         Grid grid;
         String message = "";
 
@@ -262,7 +262,7 @@ public class Game {
      * be displayed
      * @return a string containing the grid of the desired user
      */
-    public String getGrid(String sender, String username) {
+    protected String getGrid(String sender, String username) {
         boolean myGrid = sender.equals(username);
         String formattedGrid = "";
 
@@ -278,7 +278,7 @@ public class Game {
      * Removes a player from the game
      * @param username - The name of the player to be removed
      */
-    public void removePlayer(String username) {
+    protected void removePlayer(String username) {
         Grid grid;
 
         for (Iterator<Grid> iterator = gridsList.iterator(); iterator.hasNext();) {
@@ -293,7 +293,7 @@ public class Game {
      * Finds out whose turn it is next
      * @return The username of whose turn it currently is
      */
-    public String getNextMove() {
+    protected String getNextMove() {
         if (this.turnIndex >= this.gridsList.size()) {
             this.turnIndex = 0;
         }
@@ -307,7 +307,7 @@ public class Game {
      * Determines if a game still has more than one player in it
      * @return true if there is more than one player, else false
      */
-    public boolean isActive() {
+    protected boolean isActive() {
         boolean isActive = true;
         if (gridsList.size() <= 1) {
             isActive = false;
@@ -321,7 +321,7 @@ public class Game {
      * last remaining player
      * @return the last remaining player
      */
-    public String getWinner() {
+    protected String getWinner() {
         //Only 1 player left at this point
         return gridsList.get(0).getUsername();
     }
@@ -330,7 +330,7 @@ public class Game {
      * Get the username of whose turn it currently is
      * @return the username of whose turn it currently is
      */
-    public String getTurn() {
+    protected String getTurn() {
         return this.gridsList.get(this.turnIndex).getUsername();
     }
 
@@ -338,7 +338,7 @@ public class Game {
      * Determines if there are still players left in the game
      * @return - true if there are 1 players or more, else false
      */
-    public boolean hasPlayers() {
+    protected boolean hasPlayers() {
         return this.gridsList.size() >= 1;
     }
 }

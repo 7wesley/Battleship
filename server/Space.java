@@ -38,7 +38,7 @@ public enum Space {
      * Gets the symbol associated with the space
      * @return the symbol associated with the space
      */
-    public String getSymbol() {
+    protected String getSymbol() {
         return this.symbol;
     }
 
@@ -46,7 +46,7 @@ public enum Space {
      * Gets the size associated with the space
      * @return the size associated with the space
      */
-    public int getSize() {
+    protected int getSize() {
         return this.size;
     }
 
@@ -54,7 +54,7 @@ public enum Space {
      * Determines if this space is a ship
      * @return true if it a ship, else false
      */
-    public boolean isShip() {
+    protected boolean isShip() {
         boolean isShip = false;
         switch (this) {
             case Carrier:
@@ -83,7 +83,7 @@ public enum Space {
      * Randomly gets a Space
      * @return a random Space
      */
-    public static Space getRandomShip() {
+    protected static Space getRandomShip() {
         Random generator = new Random();
 
         //Bottom 4 are not ships

@@ -17,7 +17,7 @@ public class Grid {
      * @param size - The size of the grid to be created
      * @param username - The username of the grid
      */
-    public Grid(int size, String username) {
+    protected Grid(int size, String username) {
         this.grid = new Space[size][size]; 
         for (int i = 0; i < this.grid.length; i++) {
             for (int j = 0; j < this.grid[i].length; j++) {
@@ -31,7 +31,7 @@ public class Grid {
      * Gets the username of the grid
      * @return the username of the grid
      */
-    public String getUsername() {
+    protected String getUsername() {
         return this.username;
     }
 
@@ -41,7 +41,7 @@ public class Grid {
      * @param y - The y coordinate
      * @return the Enum found at the passed in coordinates
      */
-    public Space getSquare(int x, int y) {
+    protected Space getSquare(int x, int y) {
         if (x >= this.grid.length || x < 0 || y >= this.grid.length || y < 0) {
             return Space.Unknown;
         } 
@@ -54,7 +54,7 @@ public class Grid {
      * @param x - The x coordinate
      * @param y - The y coordinate
      */
-    public void setSquare(Space space, int x, int y) {
+    protected void setSquare(Space space, int x, int y) {
         this.grid[y][x] = space;
     }   
 
@@ -62,7 +62,7 @@ public class Grid {
      * Determines if this grid has any more ships
      * @return true if the grid has no ships, else false
      */
-    public boolean hasLost() {
+    protected boolean hasLost() {
         boolean hasLost = true;
 
         for (int i = 0; i < grid.length; i++) {
@@ -81,7 +81,7 @@ public class Grid {
      * @param myGrid - If the user is displaying their own grid
      * @return the formatted grid
      */
-    public String display(boolean myGrid) {
+    protected String display(boolean myGrid) {
         String text = " ";
         for (int i = 0; i < this.grid.length; i++) {
             text += "   " + i;

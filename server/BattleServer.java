@@ -3,6 +3,7 @@ package server;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Hashtable;
@@ -50,30 +51,35 @@ public class BattleServer implements MessageListener {
      */
     public void listen() throws IOException {
         BufferedReader in;
+        PrintWriter clientOut;
         
         while (!serverSocket.isClosed()) {
             //blocks while waiting for connection
             Socket clientSocket = serverSocket.accept();
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            String username = in.readLine();
+            String[] command = in.readLine().split(" ");
 
-            //Create and run thread with connectionAgent
-            ConnectionAgent player = new ConnectionAgent(clientSocket);
-            player.addMessageListener(this);
-            Thread thread = new Thread(player);
-            thread.start();
-            
-            this.players.put(username, player);
-            this.broadcast(username + " has joined the battle!");
+            //Create and run thread with connectionAgent if username isnt already present
+            if (command.length == 2 && !this.players.containsKey(command[1])) {
+                ConnectionAgent player = new ConnectionAgent(clientSocket);
+                player.addMessageListener(this);
+                Thread thread = new Thread(player);
+                thread.start();
+                this.players.put(command[1], player);
+                this.broadcast(command[1] + " has joined the battle!");
+            } else {
+                clientOut = new PrintWriter(clientSocket.getOutputStream(), true);
+                clientOut.println("Invalid command provided or username already exists");
+                clientSocket.close();
+            }
         }
-
     }
 
     /**
      * Gets the next turn from the game field and then broadcasts
      * to the room whose turn it is
      */
-    public void getNextTurn() {
+    private void getNextTurn() {
         if (this.game.isActive()) {
             String turnUsername = this.game.getNextMove();
             this.broadcast("It's " + turnUsername + "'s turn!");
@@ -102,37 +108,25 @@ public class BattleServer implements MessageListener {
      */
     public void messageReceived(String message, MessageSource source) {
         String[] command = message.split(" ");
-        String sender = command[0];
+        String sender = "";
+        for (String key: this.players.keySet()){
+            if (this.players.get(key) == source) {
+                sender = key;
+            }
+        }
 
-        switch (command[1]) {
+        switch (command[0]) {
             case "/start":
                 this.start(sender);
                 break;
             case "/surrender":
-                if (this.game != null) {
-                    this.game.removePlayer(sender);
-                    this.players.get(sender).sendMessage("You lost");
-                    this.getNextTurn();
-                } else {
-                    this.players.get(sender).sendMessage("Game not in progress!");
-                }
+                this.surrender(sender);
                 break;
             case "/fire":
-                if (this.game != null) {
-                    this.fire(sender, message);
-                } else {
-                    this.players.get(sender).sendMessage("Game not in progress!");
-                }
+                this.fire(sender, command);
                 break;
             case "/display":
-                if (this.game == null) {
-                    this.players.get(sender).sendMessage("Game not in progress!");
-                } else if (command.length != 3) {
-                    this.players.get(sender).sendMessage("Invalid command provided!");
-                } else {
-                    String grid = this.game.getGrid(sender, command[2]);
-                    this.players.get(sender).sendMessage(grid);
-                }
+                this.display(sender, command);
                 break;
             default:
                 this.players.get(sender).sendMessage("Command doesn't exist!");
@@ -145,7 +139,7 @@ public class BattleServer implements MessageListener {
      * the player attempting to start will be alerted
      * @param sender - The client sending the start request
      */
-    public void start(String sender) {
+    private void start(String sender) {
         if (this.game != null) {
             this.players.get(sender).sendMessage("Game has already started!");
         } else if (this.players.size() == 1) {
@@ -158,21 +152,53 @@ public class BattleServer implements MessageListener {
     }
 
     /**
+     * Displays a specific grid to the sender
+     * @param sender - The player who sent the command
+     * @param command - The command the player sent
+     */
+    private void display(String sender, String[] command) {
+        if (this.game == null) {
+            this.players.get(sender).sendMessage("Game not in progress!");
+        } else if (command.length != 2) {
+            this.players.get(sender).sendMessage("Invalid command provided!");
+        } else {
+            String grid = this.game.getGrid(sender, command[1]);
+            this.players.get(sender).sendMessage(grid);
+        }
+    }
+
+    /**
+     * Removes the sender from the game
+     * @param sender - The player who sent the command
+     */
+    private void surrender(String sender) {
+        if (this.game != null) {
+            this.game.removePlayer(sender);
+            this.players.get(sender).sendMessage("You lost");
+            this.getNextTurn();
+        } else {
+            this.players.get(sender).sendMessage("Game not in progress!");
+        }
+    }
+
+    /**
      * Logic for attempting to fire at a player. Will fail and alert
      * the sender if the checkValidMove method in Game returns false
      * @param sender - The client sending the fire request
      * @param message - The entire fire command
      */
-    public void fire(String sender, String message) {
-        String[] command = message.split(" ");
+    private void fire(String sender, String[] command) {
         boolean validMove = false;
 
-        if (command.length == 5 && command[2].matches("^\\d+") && command[3].matches("\\d+")) {
-            int x = Integer.parseInt(command[2]);
-            int y = Integer.parseInt(command[3]);
-            validMove = this.game.checkValidMove(sender, command[4]);
+        if (this.game == null) {
+            this.players.get(sender).sendMessage("Game not in progress!");
+            validMove = true;
+        } else if (command.length == 4 && command[1].matches("^\\d+") && command[2].matches("\\d+")) {
+            int x = Integer.parseInt(command[1]);
+            int y = Integer.parseInt(command[2]);
+            validMove = this.game.checkValidMove(sender, command[3]);
             if (validMove) {
-                String result = this.game.makeMove(command[4], y, x);
+                String result = this.game.makeMove(command[3], y, x);
                 this.broadcast(result);
                 this.getNextTurn();
             } 
