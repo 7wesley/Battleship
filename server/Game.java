@@ -309,7 +309,7 @@ public class Game {
      */
     public boolean isActive() {
         boolean isActive = true;
-        if (gridsList.size() == 1) {
+        if (gridsList.size() <= 1) {
             isActive = false;
         }
     
@@ -334,4 +334,11 @@ public class Game {
         return this.gridsList.get(this.turnIndex).getUsername();
     }
 
+    /**
+     * Determines if there are still players left in the game
+     * @return - true if there are 1 players or more, else false
+     */
+    public boolean hasPlayers() {
+        return this.gridsList.size() >= 1;
+    }
 }

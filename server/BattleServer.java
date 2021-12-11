@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Hashtable;
+import java.util.Iterator;
 
 import common.ConnectionAgent;
 import common.MessageListener;
@@ -28,7 +29,7 @@ public class BattleServer implements MessageListener {
     /** List of players in the game with usernames as keys */
     private Hashtable<String, ConnectionAgent> players;
     /** The default size of each player's grid */
-    final int DEFAULT_SIZE = 5;
+    private final int DEFAULT_SIZE = 5;
 
     /**
      * Constructor for BattleServer
@@ -75,20 +76,8 @@ public class BattleServer implements MessageListener {
     public void getNextTurn() {
         if (this.game.isActive()) {
             String turnUsername = this.game.getNextMove();
-            ConnectionAgent agent = this.players.get(turnUsername);
-            if (!agent.isConnected()) {
-                this.game.removePlayer(turnUsername);
-                this.players.remove(turnUsername);
-                try {
-                    agent.close();
-                } catch (IOException e) {
-                    System.out.println(e);
-                }
-                this.getNextTurn();
-                return;
-            }
             this.broadcast("It's " + turnUsername + "'s turn!");
-        } else {
+        } else if (this.game.hasPlayers()) {
             this.broadcast(this.game.getWinner() + " wins the battleship royale!");
             this.broadcast("Enter '/start' to play again!");
             game = null;
@@ -194,10 +183,30 @@ public class BattleServer implements MessageListener {
     }
 
     /**
-     * Removes the server as a listener from some subject
+     * Removes the server as a listener from some subject and removes the
+     * corresponding player from the game
      * @source - The subject that is being unsubscribed from
      */
     public void sourceClosed(MessageSource source) {
         source.removeMessageListener(this);
+
+        for (Iterator<String> iterator = players.keySet().iterator(); iterator.hasNext();){
+            String key = iterator.next();
+            if (this.players.get(key) == source) {
+                iterator.remove();
+                String currentTurn = "";
+
+                if (this.game != null) {
+                    currentTurn = this.game.getTurn();
+                    this.game.removePlayer(key);
+                    if (this.game.isActive() == false) {
+                        this.getNextTurn();
+                    }
+                }
+                if (this.game != null && currentTurn.equals(key)) {
+                    this.getNextTurn();
+                }
+            }
+        }
     }
 }

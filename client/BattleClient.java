@@ -26,9 +26,8 @@ public class BattleClient extends MessageSource implements MessageListener {
     private String username;
     /** Stream used for printing */
     private PrintStreamMessageListener stream;
-
     /** Connection agent used for passing messages */
-    ConnectionAgent agent;
+    private ConnectionAgent agent;
 
     /**
      * Constructor for a BattleClient
@@ -54,7 +53,7 @@ public class BattleClient extends MessageSource implements MessageListener {
     public void connect() throws IOException {
         Socket clientSocket = new Socket(this.host, this.port);
         agent = new ConnectionAgent(clientSocket);
-        agent.sendMessage(this.username);
+        agent.sendMessage("/battle " + this.username);
         agent.addMessageListener(this);
         Thread thread = new Thread(agent);
         thread.start();

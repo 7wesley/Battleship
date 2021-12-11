@@ -33,7 +33,6 @@ public class ConnectionAgent extends MessageSource implements Runnable {
         this.socket = socket;
         in = new Scanner(socket.getInputStream());
         out = new PrintStream(socket.getOutputStream());
-        this.thread = new Thread(this);
     }
 
     /**
@@ -57,14 +56,14 @@ public class ConnectionAgent extends MessageSource implements Runnable {
      * @throws IOException if socket throws IOException
      */
     public void close() throws IOException {
-        super.closeMessageSource();
         in.close();
         out.close();
         this.socket.close();
+        super.closeMessageSource();
     }
 
     /**
-     * Used to read input from server and notify
+     * Used to read input from server and notify listeners
      */
     public void run() {
         try {
